@@ -656,7 +656,7 @@ function Contact() {
                   <svg width="30" height="30" viewBox="0 0 24 24" {...ic}><path d="M5 13l4 4L19 7" /></svg>
                 </div>
                 <h3 style={{ fontSize: "1.5rem", marginBottom: ".6rem" }}>Request received.</h3>
-                <p className="text-muted">We'll review your workflow and reply with 3–5 concrete automation opportunities, usually within one business day.</p>
+                <p className="text-muted">We have received your queries. Our team will communicate within the next business day.</p>
                 <button className="btn btn-ghost" style={{ marginTop: "1.4rem" }} onClick={() => setSent(false)}>Send another →</button>
               </div>
             ) : (
