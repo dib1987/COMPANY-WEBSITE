@@ -128,7 +128,7 @@ export async function POST(req) {
       try {
         const reply = autoReplyEmail(lead);
         await sendViaResend({
-          from: `Dib — Bharat AI Automation <${fromEmail}>`,
+          from: `Dib — Bharat AI Automation Labs <${fromEmail}>`,
           to: lead.email,
           replyTo: process.env.LEAD_TO_EMAIL || fromEmail,
           subject: reply.subject,

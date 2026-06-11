@@ -37,7 +37,7 @@ From inside the `nextjs-app` folder:
 cd nextjs-app
 git init
 git add .
-git commit -m "Bharat AI Automation - v1"
+git commit -m "Bharat AI Automation Labs - v1"
 ```
 
 Create an empty repo on github.com (no README), then:

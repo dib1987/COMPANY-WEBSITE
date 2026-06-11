@@ -81,7 +81,7 @@ function Logo({ dark }) {
         <circle cx="23" cy="11" r="2.4" fill="#fff" />
       </svg>
       <span style={{ fontFamily: "var(--display)", fontWeight: 700, fontSize: "1.06rem", color: c, letterSpacing: "-0.01em" }}>
-        Bharat<span className="text-accent"> AI Automation</span>
+        Bharat AI<span className="text-accent"> Automation Labs</span>
       </span>
     </div>
   );
@@ -269,7 +269,7 @@ function Home({ go }) {
                 <span style={{ color: "var(--muted-dark)", fontSize: ".8rem", fontWeight: 500 }}>AI systems for service businesses</span>
               </div>
               <h1 className="text-white reveal in" style={{ fontSize: "clamp(2.3rem,5vw,3.9rem)", fontWeight: 700, marginBottom: "1.4rem" }}>
-                AI Automation Solutions for Businesses That Want to <span className="text-accent">Save Time</span>, <span className="text-accent">Recover Leads</span>, and Reduce Manual Work
+                AI Automation Solutions for Businesses That Want to <span className="text-accent">Save Time</span>, <span className="text-accent">Increase Leads</span>, <span className="text-accent">Recover Lost Opportunities</span> and Reduce Manual Work
               </h1>
               <p className="text-muted-dark reveal in" style={{ fontSize: "1.12rem", maxWidth: 560, marginBottom: "2.1rem" }}>
                 We help service-based businesses build practical AI workflows for lead follow-up, document processing, customer communication, AI training, and internal operations.
@@ -782,7 +782,7 @@ function Footer({ go }) {
           </div>
         </div>
         <div style={{ borderTop: "1px solid var(--line-dark)", paddingTop: "1.4rem", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: ".6rem" }}>
-          <span className="text-muted-dark" style={{ fontSize: ".82rem" }}>© {new Date().getFullYear()} Bharat AI Automation. All rights reserved.</span>
+          <span className="text-muted-dark" style={{ fontSize: ".82rem" }}>© {new Date().getFullYear()} Bharat AI Automation Labs. All rights reserved.</span>
           <span className="text-muted-dark" style={{ fontSize: ".82rem" }}>Built for service businesses that want to move faster.</span>
         </div>
       </div>

@@ -68,7 +68,7 @@ export async function POST(req) {
       const mail = bookingConfirmEmail(invitee);
       try {
         await sendViaResend({
-          from: `Dib — Bharat AI Automation <${fromEmail}>`,
+          from: `Dib — Bharat AI Automation Labs <${fromEmail}>`,
           to: invitee.email,
           replyTo: process.env.LEAD_TO_EMAIL || fromEmail,
           subject: mail.subject,
