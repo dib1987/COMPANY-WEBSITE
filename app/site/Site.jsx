@@ -8,7 +8,7 @@ import React, { useState, useEffect, useRef } from "react";
  * design-system stylesheet for tokens, type, motion and bespoke component styles.
  *
  * Ports cleanly to Next.js + Tailwind:
- *  - Move the <StyleSystem/> CSS into globals.css (or a tailwind @layer).
+ *  - The design-system CSS now lives in app/globals.css.
  *  - Replace the `page` state router with the Next.js App Router (one file per page).
  *  - Keep the SVG components and section components as-is.
  *
@@ -18,126 +18,6 @@ import React, { useState, useEffect, useRef } from "react";
  *  Signature device: a single electric-blue flow thread that runs through the site
  *  and becomes the connector inside every workflow diagram.
  */
-
-/* ------------------------------------------------------------------ */
-/*  Design tokens + stylesheet                                         */
-/* ------------------------------------------------------------------ */
-function StyleSystem() {
-  return (
-    <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
-
-      :root{
-        --ink:#0B1020;
-        --ink-2:#0E1530;
-        --navy:#11193A;
-        --cream:#F6F7F9;
-        --cream-2:#EEF0F4;
-        --line:#E3E6ED;
-        --line-dark:rgba(255,255,255,.10);
-        --accent:#2B59FF;
-        --accent-soft:rgba(43,89,255,.12);
-        --accent-2:#5B82FF;
-        --muted:#5B6478;
-        --muted-dark:#9AA3BE;
-        --display:'Space Grotesk',system-ui,sans-serif;
-        --body:'Inter',system-ui,sans-serif;
-      }
-
-      *{box-sizing:border-box}
-      .site-root{font-family:var(--body);color:var(--ink);background:var(--cream);-webkit-font-smoothing:antialiased;line-height:1.55;}
-      .site-root ::selection{background:var(--accent);color:#fff;}
-      h1,h2,h3,h4,.display{font-family:var(--display);letter-spacing:-0.02em;line-height:1.02;}
-
-      /* ---- grain ---- */
-      .grain:before{
-        content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.55;mix-blend-mode:overlay;
-        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-      }
-
-      /* ---- color helpers (no compiler, so we define them) ---- */
-      .bg-ink{background:var(--ink);} .bg-navy{background:var(--navy);} .bg-cream{background:var(--cream);}
-      .bg-cream-2{background:var(--cream-2);} .bg-white{background:#fff;}
-      .bg-accent{background:var(--accent);} .bg-accent-soft{background:var(--accent-soft);}
-      .text-ink{color:var(--ink);} .text-cream{color:var(--cream);} .text-accent{color:var(--accent);}
-      .text-muted{color:var(--muted);} .text-muted-dark{color:var(--muted-dark);} .text-white{color:#fff;}
-      .border-line{border-color:var(--line);} .border-line-dark{border-color:var(--line-dark);}
-
-      .ink-gradient{background:radial-gradient(120% 120% at 12% -10%, #1A2456 0%, var(--ink) 55%, #070B18 100%);}
-      .navy-gradient{background:linear-gradient(160deg,#141E48 0%, #0C1330 100%);}
-
-      .eyebrow{font-family:var(--body);font-weight:600;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;}
-
-      /* ---- buttons ---- */
-      .btn{display:inline-flex;align-items:center;gap:.6rem;font-family:var(--body);font-weight:600;font-size:.95rem;
-        padding:.92rem 1.5rem;border-radius:999px;cursor:pointer;border:1px solid transparent;transition:all .25s cubic-bezier(.2,.7,.3,1);white-space:nowrap;}
-      .btn-primary{background:var(--accent);color:#fff;box-shadow:0 8px 24px -8px rgba(43,89,255,.6);}
-      .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 34px -10px rgba(43,89,255,.7);}
-      .btn-primary .arrow{transition:transform .25s;}
-      .btn-primary:hover .arrow{transform:translateX(4px);}
-      .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line);}
-      .btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px);}
-      .btn-ghost-dark{background:transparent;color:#fff;border-color:var(--line-dark);}
-      .btn-ghost-dark:hover{border-color:var(--accent-2);color:var(--accent-2);transform:translateY(-2px);}
-      .btn-sm{padding:.62rem 1.05rem;font-size:.85rem;}
-
-      /* ---- nav ---- */
-      .nav{position:fixed;top:0;left:0;right:0;z-index:60;transition:all .35s ease;}
-      .nav-inner{display:flex;align-items:center;justify-content:space-between;transition:all .35s ease;}
-      .nav-scrolled{background:rgba(11,16,32,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line-dark);}
-      .nav-link{position:relative;font-weight:500;font-size:.92rem;color:rgba(255,255,255,.74);transition:color .2s;padding:.3rem 0;}
-      .nav-link:hover{color:#fff;}
-      .nav-link.active{color:#fff;}
-      .nav-link.active:after,.nav-link:hover:after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:var(--accent);border-radius:2px;}
-
-      /* ---- cards ---- */
-      .card{background:#fff;border:1px solid var(--line);border-radius:20px;transition:transform .3s cubic-bezier(.2,.7,.3,1),box-shadow .3s,border-color .3s;}
-      .card:hover{transform:translateY(-6px);box-shadow:0 28px 50px -28px rgba(11,16,32,.35);border-color:#cfd5e6;}
-      .card-dark{background:rgba(255,255,255,.035);border:1px solid var(--line-dark);border-radius:20px;transition:transform .3s,background .3s,border-color .3s;}
-      .card-dark:hover{transform:translateY(-6px);background:rgba(255,255,255,.06);border-color:rgba(91,130,255,.5);}
-
-      .icon-chip{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);border:1px solid rgba(43,89,255,.22);}
-
-      /* ---- reveal ---- */
-      .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.2,.7,.3,1),transform .7s cubic-bezier(.2,.7,.3,1);}
-      .reveal.in{opacity:1;transform:none;}
-
-      /* ---- flow thread animation ---- */
-      .flow-dash{stroke-dasharray:7 9;animation:flow 1.5s linear infinite;}
-      @keyframes flow{to{stroke-dashoffset:-32;}}
-      .pulse-node{animation:pulse 2.6s ease-in-out infinite;transform-origin:center;}
-      @keyframes pulse{0%,100%{opacity:.55;}50%{opacity:1;}}
-      .float-y{animation:floaty 7s ease-in-out infinite;}
-      @keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
-      .draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 2.4s ease forwards;}
-      @keyframes draw{to{stroke-dashoffset:0;}}
-
-      /* ---- marquee ---- */
-      .marquee{display:flex;width:max-content;animation:marq 32s linear infinite;}
-      @keyframes marq{to{transform:translateX(-50%);}}
-      .marquee-mask{-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);}
-
-      /* ---- inputs ---- */
-      .field{width:100%;font-family:var(--body);font-size:.95rem;color:var(--ink);background:#fff;border:1px solid var(--line);
-        border-radius:12px;padding:.85rem 1rem;transition:border-color .2s, box-shadow .2s;}
-      .field:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);}
-      .field::placeholder{color:#9aa1b4;}
-      .label{font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.4rem;display:block;}
-
-      /* ---- sticky contact widget ---- */
-      .contact-fab{position:fixed;right:20px;bottom:22px;z-index:55;}
-
-      /* ---- parallax band ---- */
-      .fixed-bg{background-attachment:fixed;background-size:cover;background-position:center;}
-
-      .hr-accent{height:3px;width:54px;background:var(--accent);border-radius:3px;}
-
-      @media (max-width:860px){
-        .fixed-bg{background-attachment:scroll;}
-      }
-    `}</style>
-  );
-}
 
 /* ------------------------------------------------------------------ */
 /*  Scroll reveal hook                                                 */
@@ -759,8 +639,9 @@ function Contact() {
     }
   }
   const industries = ["Gym / Fitness studio", "Dental / Healthcare clinic", "Real estate", "Coaching / Consulting", "Software / Startup", "Insurance / Finance", "Other local service"];
+  const companySizes = ["1-10", "11-50", "51-200", "201-1000", "1001-5000", "5000+"];
   const budgets = ["Not sure yet", "Under $1k", "$1k – $5k", "$5k – $15k", "$15k +"];
-  const contactPref = ["Email", "Phone", "SMS / WhatsApp"];
+  const contactPref = ["Email", "Phone"];
   return (
     <>
       <PageHero eyebrow="Contact" title={<>Request a <span className="text-accent">Free AI Automation Review.</span></>}
@@ -785,14 +666,21 @@ function Contact() {
                   style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
                 <div className="form-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.1rem" }}>
                   <Field label="Name" required><input name="name" className="field" required placeholder="Your name" /></Field>
-                  <Field label="Business name" required><input name="business" className="field" required placeholder="Your business" /></Field>
                   <Field label="Email" required><input type="email" name="email" className="field" required placeholder="you@business.com" /></Field>
+                </div>
+                <div className="form-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.1rem" }}>
+                  <Field label="Company name" required><input name="company_name" className="field" required placeholder="Your company" /></Field>
                   <Field label="Phone"><input type="tel" name="phone" className="field" placeholder="+91 ..." /></Field>
+                </div>
+                <div className="form-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.1rem" }}>
                   <Field label="Industry">
                     <select name="industry" className="field" defaultValue=""><option value="" disabled>Select industry</option>{industries.map((x) => <option key={x}>{x}</option>)}</select>
                   </Field>
-                  <Field label="Current tools used"><input name="tools" className="field" placeholder="CRM, email, spreadsheets..." /></Field>
+                  <Field label="Company size">
+                    <select name="company_size" className="field" defaultValue=""><option value="" disabled>Select company size</option>{companySizes.map((x) => <option key={x}>{x}</option>)}</select>
+                  </Field>
                 </div>
+                <Field label="Current tools used"><input name="tools" className="field" placeholder="CRM, email, spreadsheets..." /></Field>
                 <Field label="What problem are you trying to solve?" required>
                   <textarea name="problem" className="field" rows={4} required placeholder="e.g. leads come in but we follow up too late and lose them" style={{ resize: "vertical" }} />
                 </Field>
@@ -813,27 +701,11 @@ function Contact() {
             )}
           </div>
 
-          {/* CALENDLY PLACEHOLDER + info */}
+          {/* Calendly widget hidden for now — re-enable when ready to embed */}
           <div className="reveal" style={{ display: "grid", gap: "1.2rem" }}>
-            <div className="card ink-gradient grain" style={{ padding: 0, overflow: "hidden", border: "none" }}>
-              <div style={{ position: "relative", zIndex: 2, padding: "1.8rem" }}>
-                <span className="eyebrow text-accent">Prefer to book directly?</span>
-                <h3 className="text-white" style={{ fontSize: "1.3rem", margin: ".6rem 0 1rem" }}>Pick a time</h3>
-                <div style={{ border: "1.5px dashed rgba(91,130,255,.5)", borderRadius: 14, padding: "2.2rem 1.2rem", textAlign: "center", background: "rgba(255,255,255,.03)" }}>
-                  <div className="icon-chip" style={{ margin: "0 auto 1rem" }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" stroke="#5B82FF" fill="none" strokeWidth="1.6" strokeLinecap="round"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v4M16 3v4" /></svg>
-                  </div>
-                  <p className="text-white" style={{ fontWeight: 600, marginBottom: ".3rem" }}>Calendly booking widget</p>
-                  <p className="text-muted-dark" style={{ fontSize: ".85rem" }}>Placeholder — embed your Calendly inline widget here at launch.</p>
-                  <code style={{ display: "block", marginTop: "1rem", fontSize: ".72rem", color: "var(--accent-2)", background: "rgba(0,0,0,.3)", padding: ".6rem", borderRadius: 8, wordBreak: "break-all" }}>
-                    &lt;div class="calendly-inline-widget" data-url="https://calendly.com/your-handle/30min"&gt;&lt;/div&gt;
-                  </code>
-                </div>
-              </div>
-            </div>
             <div className="card" style={{ padding: "1.6rem" }}>
               <p className="eyebrow text-muted" style={{ marginBottom: ".9rem" }}>What happens next</p>
-              {["You share your current workflow", "We map where work gets stuck", "You get 3–5 ranked opportunities"].map((t, i) => (
+              {["Tell us about your business and where work gets stuck", "We map your workflow and find the automation opportunities", "You get 3–5 ranked opportunities, usually within one business day"].map((t, i) => (
                 <div key={i} style={{ display: "flex", gap: ".8rem", alignItems: "center", marginBottom: ".7rem" }}>
                   <span style={{ width: 24, height: 24, borderRadius: 99, background: "var(--accent-soft)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: ".8rem", flexShrink: 0 }}>{i + 1}</span>
                   <span className="text-muted" style={{ fontSize: ".92rem" }}>{t}</span>
@@ -877,8 +749,8 @@ function CTAband({ go }) {
     <section className="grain fixed-bg" style={{ position: "relative", backgroundImage: "linear-gradient(160deg, rgba(11,16,32,.95), rgba(8,12,24,.97)), radial-gradient(70% 60% at 20% 20%, rgba(43,89,255,.2), transparent)" }}>
       <div style={{ maxWidth: 820, margin: "0 auto", padding: "5.5rem 1.4rem", textAlign: "center", position: "relative", zIndex: 2 }}>
         <h2 className="text-white reveal" style={{ fontSize: "clamp(1.9rem,3.8vw,2.8rem)", marginBottom: "1rem" }}>See where AI pays off first.</h2>
-        <p className="text-muted-dark reveal" style={{ fontSize: "1.05rem", maxWidth: 480, margin: "0 auto 1.8rem" }}>Book a free consultation and we'll map your highest-impact automation opportunities.</p>
-        <div className="reveal"><button className="btn btn-primary" onClick={() => go("contact")}>Book a Free Consultation <span className="arrow">→</span></button></div>
+        <p className="text-muted-dark reveal" style={{ fontSize: "1.05rem", maxWidth: 480, margin: "0 auto 1.8rem" }}>Tell us about your business and we'll map your highest-impact automation opportunities — free, no obligation.</p>
+        <div className="reveal"><button className="btn btn-primary" onClick={() => go("contact")}>Get Your Free AI Automation Review <span className="arrow">→</span></button></div>
       </div>
     </section>
   );
@@ -957,7 +829,6 @@ export default function App() {
 
   return (
     <div className="site-root" ref={topRef}>
-      <StyleSystem />
       <Nav page={page} go={go} scrolled={scrolled} />
       <main>
         {page === "home" && <Home go={go} />}

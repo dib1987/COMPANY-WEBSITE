@@ -1,3 +1,5 @@
+import "./globals.css";
+
 export const metadata = {
   title: "Bharat AI Automation — Save Time, Recover Leads, Reduce Manual Work",
   description:

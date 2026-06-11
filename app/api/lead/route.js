@@ -57,10 +57,11 @@ export async function POST(req) {
     // 2) Validate + sanitize
     const lead = {
       name: clean(body.name, 120),
-      business: clean(body.business, 160),
+      company_name: clean(body.company_name, 160),
       email: clean(body.email, 200),
       phone: clean(body.phone, 40),
       industry: clean(body.industry, 80),
+      company_size: clean(body.company_size, 40),
       tools: clean(body.tools, 300),
       problem: clean(body.problem, 4000),
       budget: clean(body.budget, 40),
@@ -71,7 +72,7 @@ export async function POST(req) {
 
     const missing = [];
     if (!lead.name) missing.push("name");
-    if (!lead.business) missing.push("business");
+    if (!lead.company_name) missing.push("company_name");
     if (!isEmail(lead.email)) missing.push("email");
     if (!lead.problem) missing.push("problem");
     if (missing.length) {
@@ -104,7 +105,7 @@ export async function POST(req) {
           from: fromEmail,
           to: process.env.LEAD_TO_EMAIL,
           replyTo: lead.email,
-          subject: `New lead: ${lead.name} — ${lead.business}`,
+          subject: `New lead: ${lead.name} — ${lead.company_name}`,
           text: ownerText,
         })
       );
