@@ -649,7 +649,7 @@ function Contact() {
       <Section>
         <div className="contact-grid" style={{ display: "grid", gridTemplateColumns: "1.2fr .8fr", gap: "2.4rem", alignItems: "start" }}>
           {/* FORM */}
-          <div className="reveal card" style={{ padding: "2.4rem 2.2rem" }}>
+          <div id="lead-form" className="reveal card" style={{ padding: "2.4rem 2.2rem" }}>
             {sent ? (
               <div style={{ textAlign: "center", padding: "2rem 0" }}>
                 <div className="icon-chip" style={{ margin: "0 auto 1.2rem", width: 64, height: 64 }}>
@@ -822,10 +822,20 @@ export default function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const go = (p) => {
-    setPage(p);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  useEffect(() => {
+    if (page === "contact") {
+      const form = document.getElementById("lead-form");
+      if (form) {
+        const navHeight = 90;
+        const top = form.getBoundingClientRect().top + window.scrollY - navHeight;
+        window.scrollTo(0, Math.max(top, 0));
+        return;
+      }
+    }
+    window.scrollTo(0, 0);
+  }, [page]);
+
+  const go = (p) => setPage(p);
 
   return (
     <div className="site-root" ref={topRef}>
