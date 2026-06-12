@@ -657,6 +657,7 @@ function Contact() {
                 </div>
                 <h3 style={{ fontSize: "1.5rem", marginBottom: ".6rem" }}>Request received.</h3>
                 <p className="text-muted">We have received your queries. Our team will communicate within the next business day.</p>
+                <p className="text-muted" style={{ fontSize: ".85rem", marginTop: ".6rem" }}>Tip: check your Promotions or Spam tab for our confirmation email and move it to your Inbox so you don't miss our reply.</p>
                 <button className="btn btn-ghost" style={{ marginTop: "1.4rem" }} onClick={() => setSent(false)}>Send another →</button>
               </div>
             ) : (
