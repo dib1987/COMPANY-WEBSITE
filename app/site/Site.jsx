@@ -269,10 +269,10 @@ function Home({ go }) {
                 <span style={{ color: "var(--muted-dark)", fontSize: ".8rem", fontWeight: 500 }}>AI systems for service businesses</span>
               </div>
               <h1 className="text-white reveal in" style={{ fontSize: "clamp(2.3rem,5vw,3.9rem)", fontWeight: 700, marginBottom: "1.4rem" }}>
-                AI Automation Solutions for Businesses That Want to <span className="text-accent">Save Time</span>, <span className="text-accent">Increase Leads</span>, <span className="text-accent">Recover Lost Opportunities</span> and Reduce Manual Work
+                Never Miss Another <span className="text-accent">Business Opportunity</span>
               </h1>
               <p className="text-muted-dark reveal in" style={{ fontSize: "1.12rem", maxWidth: 560, marginBottom: "2.1rem" }}>
-                We help service-based businesses build practical AI workflows for lead follow-up, document processing, customer communication, AI training, and internal operations.
+                AI workflows that respond to leads instantly, speed up customer communication, and cut hours of manual work every week.
               </p>
               <div className="reveal in" style={{ display: "flex", gap: ".9rem", flexWrap: "wrap" }}>
                 <button className="btn btn-primary" onClick={() => go("contact")}>Book a Free Consultation <span className="arrow">→</span></button>
@@ -477,10 +477,10 @@ function Services({ go }) {
 /* ------------------------------------------------------------------ */
 function UseCases({ go }) {
   const cases = [
-    { tag: "Fitness", t: "Gym Lead Follow-up Agent", p: "Leads submit forms but staff follow up late — or forget.", s: "AI responds, qualifies, answers common questions, and nudges the lead to book a visit.", o: "Faster response, fewer lost leads, better conversion.", metric: "Minutes, not days, to first reply", diagram: <LeadFlowDiagram /> },
-    { tag: "Dental", t: "Dental Missed Appointment Recovery", p: "Missed calls and website visitors don't always convert.", s: "An AI follow-up workflow engages them and sends booking reminders.", o: "Recovered appointments that would otherwise be lost.", metric: "More chairs filled from existing demand", diagram: <LeadFlowDiagram /> },
-    { tag: "Healthcare", t: "Healthcare Document Review Agent", p: "Staff manually check intake docs, insurance forms, and missing info.", s: "AI extracts, validates, flags missing data, and routes for review.", o: "Less manual checking, faster intake.", metric: "Manual document review, sharply reduced", diagram: <DocFlowDiagram /> },
-    { tag: "Teams & Founders", t: "AI Training & Enablement", p: "Teams want to use AI but don't know where to start — or how to do it safely.", s: "Hands-on AI training and workflow design built around your real business tasks, not generic theory.", o: "Teams that actually adopt AI and start building with it.", metric: "From curious to capable, fast", diagram: <TrainDiagram /> },
+    { tag: "Fitness", t: "Turn More Gym Leads Into Members", p: "Leads submit forms but staff follow up late — or forget.", s: "AI responds, qualifies, answers common questions, and nudges the lead to book a visit.", o: "Faster response, fewer lost leads, better conversion.", metric: "Minutes, not days, to first reply", diagram: <LeadFlowDiagram /> },
+    { tag: "Dental", t: "Recover Revenue From Missed Dental Appointments", p: "Missed calls and website visitors don't always convert.", s: "An AI follow-up workflow engages them and sends booking reminders.", o: "Recovered appointments that would otherwise be lost.", metric: "More chairs filled from existing demand", diagram: <LeadFlowDiagram /> },
+    { tag: "Healthcare", t: "Cut Manual Document Review for Healthcare Intake", p: "Staff manually check intake docs, insurance forms, and missing info.", s: "AI extracts, validates, flags missing data, and routes for review.", o: "Less manual checking, faster intake.", metric: "Manual document review, sharply reduced", diagram: <DocFlowDiagram /> },
+    { tag: "Teams & Founders", t: "Get Your Team Actually Using AI", p: "Teams want to use AI but don't know where to start — or how to do it safely.", s: "Hands-on AI training and workflow design built around your real business tasks, not generic theory.", o: "Teams that actually adopt AI and start building with it.", metric: "From curious to capable, fast", diagram: <TrainDiagram /> },
   ];
   return (
     <>
