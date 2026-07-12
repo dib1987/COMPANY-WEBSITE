@@ -51,7 +51,7 @@ async function submitLeadToApi(leadData, request) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name: leadData.name,
-      company_name: "",
+      company_name: leadData.company_name || "Chatbot Lead",
       email: leadData.email,
       problem: leadData.problem,
       source: "chatbot",
