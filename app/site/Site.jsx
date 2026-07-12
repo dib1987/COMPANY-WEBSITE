@@ -793,6 +793,297 @@ function Footer({ go }) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  BharatAi Chat Widget                                              */
+/* ------------------------------------------------------------------ */
+function ChatWidget() {
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState([
+    { role: "assistant", content: "Hi, I'm BharatAi — the Bharat AI Automation Labs assistant. How can I help you today?" },
+  ]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (open && bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, open]);
+
+  useEffect(() => {
+    if (open && inputRef.current) inputRef.current.focus();
+  }, [open]);
+
+  async function send() {
+    const text = input.trim();
+    if (!text || loading) return;
+
+    const userMsg = { role: "user", content: text };
+    const nextMessages = [...messages, userMsg];
+    setMessages(nextMessages);
+    setInput("");
+    setLoading(true);
+
+    const assistantMsg = { role: "assistant", content: "" };
+    setMessages([...nextMessages, assistantMsg]);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: nextMessages }),
+      });
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6);
+          if (data === "[DONE]") break;
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.type === "text") {
+              setMessages((prev) => {
+                const copy = [...prev];
+                copy[copy.length - 1] = {
+                  ...copy[copy.length - 1],
+                  content: copy[copy.length - 1].content + parsed.text,
+                };
+                return copy;
+              });
+            }
+          } catch {}
+        }
+      }
+    } catch {
+      setMessages((prev) => {
+        const copy = [...prev];
+        copy[copy.length - 1] = { role: "assistant", content: "Sorry, something went wrong. Please try again." };
+        return copy;
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function onKeyDown(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  }
+
+  return (
+    <>
+      <style>{`
+        .chat-widget-btn {
+          position: fixed;
+          bottom: 88px;
+          right: 24px;
+          z-index: 1100;
+          background: #0B1020;
+          color: #fff;
+          border: 1.5px solid #2B59FF;
+          border-radius: 28px;
+          padding: 10px 18px 10px 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-family: var(--display, 'Space Grotesk', sans-serif);
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          box-shadow: 0 8px 28px -6px rgba(43,89,255,.45);
+          transition: box-shadow .2s, transform .15s;
+        }
+        .chat-widget-btn:hover { box-shadow: 0 12px 32px -4px rgba(43,89,255,.65); transform: translateY(-1px); }
+        .chat-widget-btn .chat-dot { width: 8px; height: 8px; border-radius: 50%; background: #2B59FF; animation: chat-pulse 1.8s ease-in-out infinite; }
+        @keyframes chat-pulse { 0%,100%{opacity:1;} 50%{opacity:.35;} }
+        .chat-panel {
+          position: fixed;
+          bottom: 160px;
+          right: 24px;
+          z-index: 1100;
+          width: 360px;
+          max-height: 520px;
+          background: #0B1020;
+          border: 1.5px solid #1e2d5a;
+          border-radius: 18px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 24px 60px -10px rgba(0,0,0,.7);
+          animation: chat-slide-up .2s ease;
+        }
+        @keyframes chat-slide-up { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
+        .chat-header {
+          padding: 14px 18px 12px;
+          border-bottom: 1px solid #1e2d5a;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .chat-header-name {
+          font-family: var(--display, 'Space Grotesk', sans-serif);
+          font-size: 15px;
+          font-weight: 700;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .chat-header-name span.accent { color: #2B59FF; }
+        .chat-close-btn {
+          background: none;
+          border: none;
+          color: #5b6478;
+          cursor: pointer;
+          padding: 2px;
+          display: flex;
+          align-items: center;
+          border-radius: 4px;
+        }
+        .chat-close-btn:hover { color: #fff; }
+        .chat-messages {
+          flex: 1;
+          overflow-y: auto;
+          padding: 14px 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          scrollbar-width: thin;
+          scrollbar-color: #1e2d5a transparent;
+        }
+        .chat-bubble {
+          max-width: 88%;
+          padding: 9px 13px;
+          border-radius: 14px;
+          font-size: 14px;
+          line-height: 1.5;
+          white-space: pre-wrap;
+          word-break: break-word;
+        }
+        .chat-bubble.assistant {
+          background: #11193A;
+          color: #d4d8e8;
+          align-self: flex-start;
+          border-bottom-left-radius: 4px;
+        }
+        .chat-bubble.user {
+          background: #2B59FF;
+          color: #fff;
+          align-self: flex-end;
+          border-bottom-right-radius: 4px;
+        }
+        .chat-input-row {
+          padding: 12px 14px;
+          border-top: 1px solid #1e2d5a;
+          display: flex;
+          gap: 8px;
+          align-items: flex-end;
+        }
+        .chat-input {
+          flex: 1;
+          background: #11193A;
+          border: 1px solid #1e2d5a;
+          border-radius: 10px;
+          color: #fff;
+          font-size: 14px;
+          padding: 8px 12px;
+          resize: none;
+          outline: none;
+          font-family: var(--body, 'Inter', sans-serif);
+          min-height: 36px;
+          max-height: 100px;
+        }
+        .chat-input::placeholder { color: #3d4a6e; }
+        .chat-input:focus { border-color: #2B59FF; }
+        .chat-send-btn {
+          background: #2B59FF;
+          border: none;
+          border-radius: 10px;
+          width: 36px;
+          height: 36px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          transition: background .15s;
+        }
+        .chat-send-btn:hover:not(:disabled) { background: #1a40d6; }
+        .chat-send-btn:disabled { opacity: .45; cursor: default; }
+        .chat-typing { display: flex; gap: 4px; align-items: center; padding: 2px 0; }
+        .chat-typing span { width: 6px; height: 6px; border-radius: 50%; background: #5b6478; animation: typing-bounce .9s ease-in-out infinite; }
+        .chat-typing span:nth-child(2) { animation-delay: .15s; }
+        .chat-typing span:nth-child(3) { animation-delay: .3s; }
+        @keyframes typing-bounce { 0%,60%,100%{transform:translateY(0);} 30%{transform:translateY(-5px);} }
+        @media(max-width:420px){
+          .chat-panel { width: calc(100vw - 16px); right: 8px; bottom: 140px; }
+          .chat-widget-btn { right: 8px; bottom: 80px; }
+        }
+      `}</style>
+
+      {open && (
+        <div className="chat-panel" role="dialog" aria-label="BharatAi chat">
+          <div className="chat-header">
+            <div className="chat-header-name">
+              <div className="chat-dot" />
+              Bharat<span className="accent">Ai</span>
+              <span style={{ fontSize: 12, fontWeight: 400, color: "#5b6478", marginLeft: 4 }}>· Ask me anything</span>
+            </div>
+            <button className="chat-close-btn" onClick={() => setOpen(false)} aria-label="Close chat">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <div className="chat-messages">
+            {messages.map((m, i) => (
+              <div key={i} className={`chat-bubble ${m.role}`}>
+                {m.role === "assistant" && loading && i === messages.length - 1 && m.content === "" ? (
+                  <div className="chat-typing"><span /><span /><span /></div>
+                ) : m.content}
+              </div>
+            ))}
+            <div ref={bottomRef} />
+          </div>
+
+          <div className="chat-input-row">
+            <textarea
+              ref={inputRef}
+              className="chat-input"
+              placeholder="Type a message…"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={onKeyDown}
+              rows={1}
+            />
+            <button className="chat-send-btn" onClick={send} disabled={loading || !input.trim()} aria-label="Send">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
+      <button className="chat-widget-btn" onClick={() => setOpen((o) => !o)} aria-label="Open BharatAi chat">
+        <div className="chat-dot" />
+        BharatAi
+      </button>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Sticky contact FAB                                                 */
 /* ------------------------------------------------------------------ */
 function ContactFab({ go, page }) {
@@ -849,6 +1140,7 @@ export default function App() {
         {page === "contact" && <Contact go={go} />}
       </main>
       <Footer go={go} />
+      <ChatWidget />
       <ContactFab go={go} page={page} />
     </div>
   );
