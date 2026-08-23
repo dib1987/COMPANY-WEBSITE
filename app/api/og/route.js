@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
+// Node.js runtime: more reliable outbound networking than edge for font fetching
+export const runtime = 'nodejs';
 
 const nodes = [
   [55, 113], [192, 63], [310, 139], [401, 76],
@@ -21,20 +22,21 @@ const sizes = [5, 4, 6, 3, 5, 7, 5, 3, 3, 6, 8, 5, 4, 3, 4];
 async function loadGoogleFont(family, weight) {
   const css = await fetch(
     `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`,
-    { headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' } }
+    {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
+    }
   ).then((r) => r.text());
 
+  // Google Fonts CSS lists multiple unicode-range blocks; grab the first woff2 URL (Latin)
   const match = css.match(/src:\s*url\(([^)]+)\)\s*format\(['"]?woff2['"]?\)/);
-  if (!match) throw new Error(`woff2 URL not found for ${family} ${weight}`);
+  if (!match) throw new Error(`woff2 not found for ${family} ${weight}`);
   return fetch(match[1]).then((r) => r.arrayBuffer());
 }
 
-export async function GET() {
-  const [spaceGroteskBold, interLight] = await Promise.all([
-    loadGoogleFont('Space Grotesk', 700),
-    loadGoogleFont('Inter', 300),
-  ]);
-
+function buildImage(fonts) {
   return new ImageResponse(
     (
       <div
@@ -43,7 +45,8 @@ export async function GET() {
           height: '100%',
           display: 'flex',
           flexDirection: 'row',
-          background: 'radial-gradient(140% 130% at 15% -15%, #1A2456 0%, #0B1020 52%, #060B18 100%)',
+          background:
+            'radial-gradient(140% 130% at 15% -15%, #1A2456 0%, #0B1020 52%, #060B18 100%)',
         }}
       >
         {/* Left: text content */}
@@ -79,7 +82,7 @@ export async function GET() {
             />
             <span
               style={{
-                fontFamily: 'Inter',
+                fontFamily: fonts ? 'Inter' : 'sans-serif',
                 fontSize: 13,
                 fontWeight: 300,
                 letterSpacing: '0.16em',
@@ -95,7 +98,7 @@ export async function GET() {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span
               style={{
-                fontFamily: 'Space Grotesk',
+                fontFamily: fonts ? 'Space Grotesk' : 'sans-serif',
                 fontSize: 84,
                 fontWeight: 700,
                 color: '#ffffff',
@@ -107,7 +110,7 @@ export async function GET() {
             </span>
             <span
               style={{
-                fontFamily: 'Inter',
+                fontFamily: fonts ? 'Inter' : 'sans-serif',
                 fontSize: 28,
                 fontWeight: 300,
                 color: '#9AA3BE',
@@ -131,7 +134,7 @@ export async function GET() {
             />
             <span
               style={{
-                fontFamily: 'Inter',
+                fontFamily: fonts ? 'Inter' : 'sans-serif',
                 fontSize: 26,
                 fontWeight: 300,
                 color: 'rgba(246,247,249,0.75)',
@@ -146,7 +149,7 @@ export async function GET() {
           {/* URL */}
           <span
             style={{
-              fontFamily: 'Inter',
+              fontFamily: fonts ? 'Inter' : 'sans-serif',
               fontSize: 14,
               fontWeight: 300,
               color: '#9AA3BE',
@@ -165,7 +168,6 @@ export async function GET() {
             viewBox="0 0 456 630"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Fade gradient: left edge blends into background */}
             <defs>
               <linearGradient id="fadeLeft" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#0B1020" />
@@ -173,7 +175,6 @@ export async function GET() {
               </linearGradient>
             </defs>
 
-            {/* Edges */}
             {edges.map(([a, b], i) => (
               <line
                 key={i}
@@ -184,7 +185,6 @@ export async function GET() {
               />
             ))}
 
-            {/* Nodes: glow ring + core */}
             {nodes.map(([cx, cy], i) => {
               const r = sizes[i];
               const isHero = i === 10;
@@ -211,11 +211,7 @@ export async function GET() {
               );
             })}
 
-            {/* Left fade overlay */}
-            <rect
-              x="0" y="0" width="456" height="630"
-              fill="url(#fadeLeft)"
-            />
+            <rect x="0" y="0" width="456" height="630" fill="url(#fadeLeft)" />
           </svg>
         </div>
       </div>
@@ -223,10 +219,27 @@ export async function GET() {
     {
       width: 1200,
       height: 630,
-      fonts: [
-        { name: 'Space Grotesk', data: spaceGroteskBold, weight: 700, style: 'normal' },
-        { name: 'Inter', data: interLight, weight: 300, style: 'normal' },
-      ],
+      ...(fonts
+        ? {
+            fonts: [
+              { name: 'Space Grotesk', data: fonts.spaceGrotesk, weight: 700, style: 'normal' },
+              { name: 'Inter', data: fonts.inter, weight: 300, style: 'normal' },
+            ],
+          }
+        : {}),
     }
   );
+}
+
+export async function GET() {
+  try {
+    const [spaceGrotesk, inter] = await Promise.all([
+      loadGoogleFont('Space Grotesk', 700),
+      loadGoogleFont('Inter', 300),
+    ]);
+    return buildImage({ spaceGrotesk, inter });
+  } catch {
+    // Font fetch failed — render with system sans-serif so the image always shows
+    return buildImage(null);
+  }
 }
