@@ -14,7 +14,7 @@ export const metadata = {
     siteName: "Bharat AI Automation Labs",
     images: [
       {
-        url: "/api/og",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Bharat AI Automation Labs — AI Automation for Modern Business",
@@ -27,7 +27,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Bharat AI Automation Labs",
     description: "AI Automation for Modern Business",
-    images: ["/api/og"],
+    images: ["/og-image.png"],
   },
 };
 
